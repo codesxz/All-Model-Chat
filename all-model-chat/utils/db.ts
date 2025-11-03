@@ -61,10 +61,26 @@ async function getAll<T>(storeName: string): Promise<T[]> {
 
 async function setAll<T>(storeName: string, values: T[]): Promise<void> {
   const db = await getDb();
+  // 不要先 clear，而是逐个更新/删除
   const tx = db.transaction(storeName, 'readwrite');
   const store = tx.objectStore(storeName);
-  store.clear();
-  values.forEach(value => store.put(value));
+
+  // 1. 获取现有的所有键
+  const existingKeys = await requestToPromise(store.getAllKeys());
+  const newKeys = new Set(values.map((v: any) => v.id));
+  
+  // 2. 更新或添加新值
+  for (const value of values) {
+    await requestToPromise(store.put(value));
+  }
+  
+  // 3. 删除不存在的旧值
+  for (const key of existingKeys) {
+    if (!newKeys.has(key)) {
+      await requestToPromise(store.delete(key));
+    }
+  }
+
   return transactionToPromise(tx);
 }
 
