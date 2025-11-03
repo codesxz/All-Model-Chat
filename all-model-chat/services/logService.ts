@@ -15,7 +15,7 @@ type ApiKeyListener = (usage: Map<string, number>) => void;
 
 const LOG_STORAGE_KEY = 'chatLogEntries';
 const API_USAGE_STORAGE_KEY = 'chatApiUsageData';
-const LOG_RETENTION_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
+const LOG_RETENTION_MS = 31 * 24 * 60 * 60 * 1000; // 31 days
 
 class LogServiceImpl {
   private logs: LogEntry[] = [];
