@@ -64,11 +64,12 @@ async function getAll<T>(storeName: string): Promise<T[]> {
   return requestToPromise(db.transaction(storeName, 'readonly').objectStore(storeName).getAll());
 }
 
-async function setAll<T extends { id: string }>(storeName: string, values: T[]): Promise<void> {
+async function setAll<T>(storeName: string, values: T[]): Promise<void> {
   const db = await getDb();
+  // 不要先 clear，而是逐个更新/删除
   const tx = db.transaction(storeName, 'readwrite');
   const store = tx.objectStore(storeName);
-  
+
   // ✅ 方法 1：先获取所有现有键
   const existingKeys = await requestToPromise<IDBValidKey[]>(store.getAllKeys());
   const newKeysSet = new Set(values.map(v => v.id));
@@ -84,8 +85,8 @@ async function setAll<T extends { id: string }>(storeName: string, values: T[]):
       store.delete(key);
     }
   }
-  
-  return await transactionToPromise(tx);
+
+  return transactionToPromise(tx);
 }
 
 async function getKeyValue<T>(key: string): Promise<T | undefined> {
