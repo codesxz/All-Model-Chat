@@ -59,41 +59,29 @@ async function getAll<T>(storeName: string): Promise<T[]> {
   return requestToPromise(db.transaction(storeName, 'readonly').objectStore(storeName).getAll());
 }
 
-async function setAll<T extends { id: string }>(storeName: string, values: T[]): Promise<void> {
+async function setAll<T>(storeName: string, values: T[]): Promise<void> {
   const db = await getDb();
+  // 不要先 clear，而是逐个更新/删除
+  const tx = db.transaction(storeName, 'readwrite');
+  const store = tx.objectStore(storeName);
+
+  // 1. 获取现有的所有键
+  const existingKeys = await requestToPromise(store.getAllKeys());
+  const newKeys = new Set(values.map((v: any) => v.id));
   
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readwrite');
-    const store = tx.objectStore(storeName);
-    
-    // 创建一个请求队列
-    const requests: IDBRequest[] = [];
-    
-    // 1. 获取所有现有键
-    const getAllKeysRequest = store.getAllKeys();
-    requests.push(getAllKeysRequest);
-    
-    getAllKeysRequest.onsuccess = () => {
-      const existingKeys = getAllKeysRequest.result as string[];
-      const newKeysSet = new Set(values.map(v => v.id));
-      
-      // 2. 添加/更新数据
-      for (const value of values) {
-        requests.push(store.put(value));
-      }
-      
-      // 3. 删除不存在的键
-      for (const key of existingKeys) {
-        if (!newKeysSet.has(key)) {
-          requests.push(store.delete(key));
-        }
-      }
-    };
-    
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(new Error('Transaction aborted'));
-  });
+  // 2. 更新或添加新值
+  for (const value of values) {
+    await requestToPromise(store.put(value));
+  }
+  
+  // // 3. 删除不存在的旧值
+  // for (const key of existingKeys) {
+  //   if (!newKeys.has(key)) {
+  //     await requestToPromise(store.delete(key));
+  //   }
+  // }
+
+  return transactionToPromise(tx);
 }
 
 async function getKeyValue<T>(key: string): Promise<T | undefined> {
