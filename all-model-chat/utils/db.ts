@@ -59,11 +59,6 @@ async function getAll<T>(storeName: string): Promise<T[]> {
   return requestToPromise(db.transaction(storeName, 'readonly').objectStore(storeName).getAll());
 }
 
-async function getAll<T>(storeName: string): Promise<T[]> {
-  const db = await getDb();
-  return requestToPromise(db.transaction(storeName, 'readonly').objectStore(storeName).getAll());
-}
-
 async function setAll<T>(storeName: string, values: T[]): Promise<void> {
   const db = await getDb();
   // 不要先 clear，而是逐个更新/删除
