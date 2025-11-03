@@ -74,12 +74,12 @@ async function setAll<T>(storeName: string, values: T[]): Promise<void> {
     await requestToPromise(store.put(value));
   }
   
-  // 3. 删除不存在的旧值
-  for (const key of existingKeys) {
-    if (!newKeys.has(key)) {
-      await requestToPromise(store.delete(key));
-    }
-  }
+  // // 3. 删除不存在的旧值
+  // for (const key of existingKeys) {
+  //   if (!newKeys.has(key)) {
+  //     await requestToPromise(store.delete(key));
+  //   }
+  // }
 
   return transactionToPromise(tx);
 }
