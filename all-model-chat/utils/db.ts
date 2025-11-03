@@ -85,7 +85,7 @@ async function setAll<T extends { id: string }>(storeName: string, values: T[]):
     }
   }
   
-  await transactionToPromise(tx);
+  return await transactionToPromise(tx);
 }
 
 async function getKeyValue<T>(key: string): Promise<T | undefined> {
