@@ -89,7 +89,8 @@ export const useChatHistory = ({
             groupId: null,
         };
 
-        updateAndPersistSessions(prev => [newSession, ...prev.filter(s => s.messages.length > 0)]);
+        // ✅ 修改：不要过滤历史会话，只添加新会话
+        updateAndPersistSessions(prev => [newSession, ...prev]);
         setActiveSessionId(newSessionId);
         dbService.setActiveSessionId(newSessionId);
 
