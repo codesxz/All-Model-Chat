@@ -254,7 +254,13 @@ export const ChatInput: React.FC<ChatInputProps> = (props) => {
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleSlashInputChange(e.target.value);
+      const newValue = e.target.value;
+      handleSlashInputChange(newValue);
+      
+      // 当输入框变空时自动退出编辑模式
+      if (isEditing && !newValue.trim()) {
+          onCancelEdit();
+      }
   };
 
   const isModalOpen = showCreateTextFileEditor || showCamera || showRecorder;
