@@ -1,0 +1,6 @@
+name = "all-mode-chat"
+compatibility_date = "2025-10-08"
+
+[assets]
+directory = "./dist/"
+not_found_handling = "single-page-application"
