@@ -75,6 +75,7 @@ export const buildGenerationConfig = (
     }
 
     const modelSupportsThinking = [
+        'gemini-3-pro-preview',
         'models/gemini-flash-lite-latest',
         'gemini-2.5-pro',
         'models/gemini-flash-latest'
