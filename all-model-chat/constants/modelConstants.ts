@@ -8,6 +8,7 @@ export const TAB_CYCLE_MODELS: string[] = [
 ];
 
 export const THINKING_BUDGET_RANGES: { [key: string]: { min: number; max: number } } = {
+    'gemini-3-pro-preview': { min: 128, max: 65535 },
     'models/gemini-flash-latest': { min: 1, max: 24576 },
     'gemini-2.5-pro': { min: 128, max: 32768 },
     'models/gemini-flash-lite-latest': { min: 512, max: 24576 },
