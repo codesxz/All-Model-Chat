@@ -70,3 +70,38 @@ export const getKeyForRequest = (
     logUsage(nextKey);
     return { key: nextKey, isNewKey: true };
 };
+
+// 新增：强制切换到下一个 key
+export const forceRotateApiKey = (appSettings: AppSettings): void => {
+    const { apiKeysString } = getActiveApiConfig(appSettings);
+    if (!apiKeysString) return;
+    
+    const availableKeys = apiKeysString.split('\n').map(k => k.trim()).filter(Boolean);
+    if (availableKeys.length <= 1) {
+        logService.warn("Cannot rotate key: only one or no keys available.");
+        return;
+    }
+
+    let lastUsedIndex = -1;
+    try {
+        const storedIndex = localStorage.getItem(API_KEY_LAST_USED_INDEX_KEY);
+        if (storedIndex) {
+            lastUsedIndex = parseInt(storedIndex, 10);
+        }
+    } catch (e) {
+        logService.error("Could not parse last used API key index during rotation", e);
+    }
+
+    if (isNaN(lastUsedIndex) || lastUsedIndex < 0 || lastUsedIndex >= availableKeys.length) {
+        lastUsedIndex = -1;
+    }
+
+    const nextIndex = (lastUsedIndex + 1) % availableKeys.length;
+    
+    try {
+        localStorage.setItem(API_KEY_LAST_USED_INDEX_KEY, nextIndex.toString());
+        logService.info(`API key rotated from index ${lastUsedIndex} to ${nextIndex}`);
+    } catch (e) {
+        logService.error("Could not save rotated API key index", e);
+    }
+};
