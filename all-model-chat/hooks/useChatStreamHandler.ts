@@ -44,7 +44,7 @@ export const useChatStreamHandler = ({
         const newModelMessageIds = new Set<string>([generationId]);
 
         const streamOnError = (error: Error) => {
-            handleApiError(error, currentSessionId, generationId);
+            handleApiError(error, currentSessionId, generationId, "Error", appSettings);
             setLoadingSessionIds(prev => { const next = new Set(prev); next.delete(currentSessionId); return next; });
             activeJobs.current.delete(generationId);
         };
